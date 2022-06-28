@@ -7,13 +7,14 @@
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located."
             },
-            "defaultValue": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/armtemplates/Hostpool_5-24-2022/nestedTemplates/"
+            "defaultValue": "https://raw.githubusercontent.com/Azure/RDS-Templates/master/ARM-wvd-templates/nestedtemplates/"
         },
         "artifactsLocation": {
             "type": "string",
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located."
-            }
+            },
+            "defaultValue": "https://raw.githubusercontent.com/Azure/RDS-Templates/master/ARM-wvd-templates/DSC/Configuration.zip"
         },
         "hostpoolName": {
             "type": "string",
@@ -180,20 +181,6 @@
                 "description": "The size of the session host VMs."
             }
         },
-        "vmDiskSizeGB": {
-            "type": "int",
-            "metadata": {
-                "description": "The size of the session host VMs in GB. If the value of this parameter is 0, the disk will be created with the default size set in the image."
-            },
-            "defaultValue": 0
-        },
-        "vmHibernate": {
-            "type": "bool",
-            "metadata": {
-                "description": "Whether the VMs created will be hibernate enabled"
-            },
-            "defaultValue": false
-        },
         "vmInitialNumber": {
             "type": "int",
             "metadata": {
@@ -285,6 +272,19 @@
             "metadata": {
                 "description": "The VM disk type for the VM: HDD or SSD."
             }
+        },
+        "vmUseManagedDisks": {
+            "type": "bool",
+            "metadata": {
+                "description": "True indicating you would like to use managed disks or false indicating you would like to use unmanaged disks."
+            }
+        },
+        "storageAccountResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "(Required when vmUseManagedDisks = False) The resource group containing the storage account of the image vhd file."
+            },
+            "defaultValue": ""
         },
         "existingVnetName": {
             "type": "string",
@@ -391,14 +391,14 @@
         "aadJoin": {
             "type": "bool",
             "metadata": {
-                "description": "IMPORTANT: You can use this parameter for the test purpose only as AAD Join is public preview. True if AAD Join, false if AD join"
+                "description": "True if AAD Join, false if AD join"
             },
             "defaultValue": false
         },
         "intune": {
             "type": "bool",
             "metadata": {
-                "description": "IMPORTANT: Please don't use this parameter as intune enrollment is not supported yet. True if intune enrollment is selected.  False otherwise"
+                "description": "True if intune enrollment is selected. False otherwise"
             },
             "defaultValue": false
         },
@@ -438,34 +438,15 @@
                 "description": "System data is used for internal purposes, such as support preview features."
             },
             "defaultValue": {}
-        },
-        "securityType": {
-            "type": "string",
-            "metadata": {
-                "description": "Specifies the SecurityType of the virtual machine. It is set as TrustedLaunch to enable UefiSettings. Default: UefiSettings will not be enabled unless this property is set as TrustedLaunch."
-            },
-            "defaultValue": ""
-        },
-        "secureBoot": {
-            "type": "bool",
-            "metadata": {
-                "description": "Specifies whether secure boot should be enabled on the virtual machine."
-            },
-            "defaultValue": false
-        },
-        "vTPM": {
-            "type": "bool",
-            "metadata": {
-                "description": "Specifies whether vTPM (Virtual Trusted Platform Module) should be enabled on the virtual machine."
-            },
-            "defaultValue": false
         }
     },
     "variables": {
+        "rdshManagedDisks": "[if(equals(parameters('vmImageType'), 'CustomVHD'), parameters('vmUseManagedDisks'), bool('true'))]",
         "rdshPrefix": "[concat(parameters('vmNamePrefix'),'-')]",
+        "avSetSKU": "[if(variables('rdshManagedDisks'), 'Aligned', 'Classic')]",
         "vhds": "[concat('vhds','/', variables('rdshPrefix'))]",
         "subnet-id": "[resourceId(parameters('virtualNetworkResourceGroupName'),'Microsoft.Network/virtualNetworks/subnets',parameters('existingVnetName'), parameters('existingSubnetName'))]",
-        "vmTemplateName": "[concat( 'managedDisks-', toLower(replace(parameters('vmImageType'),' ', '')), 'vm')]",
+        "vmTemplateName": "[concat( if(variables('rdshManagedDisks'), 'managedDisks', 'unmanagedDisks'), '-', toLower(replace(parameters('vmImageType'),' ', '')), 'vm')]",
         "vmTemplateUri": "[concat(parameters('nestedTemplatesLocation'), variables('vmTemplateName'),'.json')]",
         "rdshVmNamesOutput": {
             "copy": [
@@ -526,7 +507,7 @@
                                 "platformFaultDomainCount": "[parameters('availabilitySetFaultDomainCount')]"
                             },
                             "sku": {
-                                "name": "Aligned"
+                                "name": "[variables('avSetSKU')]"
                             }
                         }
                     ]
@@ -551,20 +532,55 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
+                    "hostpoolProperties": {
+                        "value": {
+                            "friendlyName": null,
+                            "description": "Created through the Azure Virtual Desktop extension",
+                            "hostPoolType": "Personal",
+                            "personalDesktopAssignmentType": "Direct",
+                            "applicationGroupReferences": [
+                                "/subscriptions/3809d259-20d6-426f-b6c7-e82358b3dc7d/resourcegroups/RG-PrepProdTest/providers/Microsoft.DesktopVirtualization/applicationgroups/Vnextdaas"
+                            ],
+                            "customRdpProperty": "drivestoredirect:s:;audiomode:i:0;videoplaybackmode:i:1;redirectclipboard:i:1;redirectprinters:i:1;devicestoredirect:s:;redirectcomports:i:1;redirectsmartcards:i:1;usbdevicestoredirect:s:*;enablecredsspsupport:i:1;use multimon:i:1;targetisaadjoined:i:1;audiocapturemode:i:1;camerastoredirect:s:*;encode redirected video capture:i:1;",
+                            "maxSessionLimit": 999999,
+                            "loadBalancerType": "Persistent",
+                            "validationEnvironment": false,
+                            "ring": null,
+                            "registrationInfo": {
+                                "expirationTime": "2022-06-30T18:30:00Z",
+                                "token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjcyM0YzMzgzQjhGNTBGRURDMjc0QTUyMUNFNEEwRTlDMkU0MjJBRjciLCJ0eXAiOiJKV1QifQ.eyJSZWdpc3RyYXRpb25JZCI6ImFmYTkxMGFmLWJmYWYtNGRjNS1iNTczLWE3ODRmNzVmZDhhNSIsIkJyb2tlclVyaSI6Imh0dHBzOi8vcmRicm9rZXItZy1ldS1yMC53dmQubWljcm9zb2Z0LmNvbS8iLCJEaWFnbm9zdGljc1VyaSI6Imh0dHBzOi8vcmRkaWFnbm9zdGljcy1nLWV1LXIwLnd2ZC5taWNyb3NvZnQuY29tLyIsIkVuZHBvaW50UG9vbElkIjoiMzQ3NzgxYjMtMzQ4Yi00YjFlLWI0YTMtNzBlZWEwMWMyM2NjIiwiR2xvYmFsQnJva2VyVXJpIjoiaHR0cHM6Ly9yZGJyb2tlci53dmQubWljcm9zb2Z0LmNvbS8iLCJHZW9ncmFwaHkiOiJFVSIsIkdsb2JhbEJyb2tlclJlc291cmNlSWRVcmkiOiJodHRwczovL3JkYnJva2VyLnd2ZC5taWNyb3NvZnQuY29tLyIsIkJyb2tlclJlc291cmNlSWRVcmkiOiJodHRwczovL3JkYnJva2VyLWctZXUtcjAud3ZkLm1pY3Jvc29mdC5jb20vIiwiRGlhZ25vc3RpY3NSZXNvdXJjZUlkVXJpIjoiaHR0cHM6Ly9yZGRpYWdub3N0aWNzLWctZXUtcjAud3ZkLm1pY3Jvc29mdC5jb20vIiwiQUFEVGVuYW50SWQiOiIzMjllOTFiMC1lMjFmLTQ4ZmItYTA3MS00NTY3MTdlY2MyOGUiLCJuYmYiOjE2NTUyOTQ0ODYsImV4cCI6MTY1NjYxMzgwMCwiaXNzIjoiUkRJbmZyYVRva2VuTWFuYWdlciIsImF1ZCI6IlJEbWkifQ.DmcJoe8S1hFEXgYTZeImn4CV10dbzJm_HCxh3F2YHm6WWZo60smgz1pUSeAPbWZksDOF0eCfoGR9HQQuNRArhH0Wb9csaFYqfNRV8NCMs8i46jeMWXGg01tIUrOubp-lolVIClnXa6vrPWOZ8-eonod-8KG9bOIxl-cNwPjP1BhtF7KiHCcMIiBI2CMZrBmn8r7ZpA0al4D1U0QpuQqqAG13JNZ12hINyC2dBkamKXR3b5deNlWsd5TQlDetjawZhulu4aUDK1_NUv-VTlVKWENv-FcG3iuHxWG933IlaCHSYMUFIpLCkF_TKdm1YelMaefUR7BFa-FDcIYdMqAcyA",
+                                "resetToken": false,
+                                "registrationTokenOperation": "None"
+                            },
+                            "vmTemplate": "{\"domain\":\"\",\"galleryImageOffer\":null,\"galleryImagePublisher\":null,\"galleryImageSKU\":null,\"imageType\":\"CustomImage\",\"imageUri\":null,\"customImageId\":\"/subscriptions/3809d259-20d6-426f-b6c7-e82358b3dc7d/resourceGroups/rg-iasp-eun-management/providers/Microsoft.Compute/galleries/VnextDaasGallery/images/MI-NE-AVD-P-01-BaseImage/versions/0.0.3\",\"namePrefix\":\"avdvnext50\",\"osDiskType\":\"Standard_LRS\",\"vmSize\":{\"id\":\"Standard_D2s_v3\",\"cores\":2,\"ram\":8},\"galleryItemId\":null,\"hibernate\":false,\"diskSizeGB\":0}",
+                            "preferredAppGroupType": "Desktop",
+                            "migrationRequest": null,
+                            "cloudPcResource": false,
+                            "startVMOnConnect": true,
+                            "ssoadfsAuthority": null,
+                            "ssoClientId": null,
+                            "ssoClientSecretKeyVaultPath": null,
+                            "ssoSecretType": null,
+                            "objectId": "347781b3-348b-4b1e-b4a3-70eea01c23cc"
+                        }
+                    },
                     "artifactsLocation": {
-                        "value": "[parameters('artifactsLocation')]"
+                        "value": "[parameters('https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_05-03-2022.zip')]"
                     },
                     "availabilityOption": {
-                        "value": "[parameters('availabilityOption')]"
+                        "value": "[parameters('AvailabilityZone')]"
                     },
                     "availabilitySetName": {
                         "value": "[parameters('availabilitySetName')]"
                     },
                     "availabilityZone": {
-                        "value": "[parameters('availabilityZone')]"
+                        "value": "[parameters('2')]"
                     },
                     "vmImageVhdUri": {
                         "value": "[parameters('vmImageVhdUri')]"
+                    },
+                    "storageAccountResourceGroupName": {
+                        "value": "[parameters('storageAccountResourceGroupName')]"
                     },
                     "vmGalleryImageOffer": {
                         "value": "[parameters('vmGalleryImageOffer')]"
@@ -582,52 +598,46 @@
                         "value": "[parameters('vmGalleryImageVersion')]"
                     },
                     "rdshPrefix": {
-                        "value": "[variables('rdshPrefix')]"
+                        "value": "[variables('avdvnext')]"
                     },
                     "rdshNumberOfInstances": {
-                        "value": "[parameters('vmNumberOfInstances')]"
+                        "value": "[parameters('1')]"
                     },
                     "rdshVMDiskType": {
-                        "value": "[parameters('vmDiskType')]"
+                        "value": "[parameters('Standard_LRS')]"
                     },
                     "rdshVmSize": {
-                        "value": "[parameters('vmSize')]"
-                    },
-                    "rdshVmDiskSizeGB": {
-                        "value": "[parameters('vmDiskSizeGB')]"
-                    },
-                    "rdshHibernate": {
-                        "value": "[parameters('vmHibernate')]"
+                        "value": "[parameters('Standard_D2s_v3')]"
                     },
                     "enableAcceleratedNetworking": {
                         "value": false
                     },
                     "vmAdministratorAccountUsername": {
-                        "value": "[parameters('vmAdministratorAccountUsername')]"
+                        "value": "[parameters('svc-preprod')]"
                     },
                     "vmAdministratorAccountPassword": {
-                        "value": "[parameters('vmAdministratorAccountPassword')]"
+                        "value": "[parameters('Dad#01WinterEnd')]"
                     },
                     "administratorAccountUsername": {
-                        "value": "[parameters('administratorAccountUsername')]"
+                        "value": "[parameters('svc-preprod')]"
                     },
                     "administratorAccountPassword": {
-                        "value": "[parameters('administratorAccountPassword')]"
+                        "value": "[parameters('Dad#01WinterEnd')]"
                     },
                     "subnet-id": {
-                        "value": "[variables('subnet-id')]"
+                        "value": "[variables('Pre_Prod_Subnet')]"
                     },
                     "vhds": {
                         "value": "[variables('vhds')]"
                     },
                     "rdshImageSourceId": {
-                        "value": "[parameters('vmCustomImageSourceId')]"
+                        "value": "[parameters('/subscriptions/3809d259-20d6-426f-b6c7-e82358b3dc7d/resourceGroups/rg-iasp-eun-management/providers/Microsoft.Compute/galleries/VnextDaasGallery/images/MI-NE-AVD-P-01-BaseImage/versions/0.0.3')]"
                     },
                     "location": {
-                        "value": "[parameters('vmLocation')]"
+                        "value": "[parameters('northeurope')]"
                     },
                     "createNetworkSecurityGroup": {
-                        "value": "[parameters('createNetworkSecurityGroup')]"
+                        "value": "[parameters('false')]"
                     },
                     "networkSecurityGroupId": {
                         "value": "[parameters('networkSecurityGroupId')]"
@@ -648,13 +658,13 @@
                         "value": "[parameters('imageTags')]"
                     },
                     "vmInitialNumber": {
-                        "value": "[parameters('vmInitialNumber')]"
+                        "value": "[parameters('50')]"
                     },
                     "hostpoolName": {
-                        "value": "[parameters('hostpoolName')]"
+                        "value": "[parameters('HP-PreprodTest')]"
                     },
                     "hostpoolToken": {
-                        "value": "[parameters('hostpoolToken')]"
+                        "value": "[parameters('eyJhbGciOiJSUzI1NiIsImtpZCI6IjcyM0YzMzgzQjhGNTBGRURDMjc0QTUyMUNFNEEwRTlDMkU0MjJBRjciLCJ0eXAiOiJKV1QifQ.eyJSZWdpc3RyYXRpb25JZCI6ImFmYTkxMGFmLWJmYWYtNGRjNS1iNTczLWE3ODRmNzVmZDhhNSIsIkJyb2tlclVyaSI6Imh0dHBzOi8vcmRicm9rZXItZy1ldS1yMC53dmQubWljcm9zb2Z0LmNvbS8iLCJEaWFnbm9zdGljc1VyaSI6Imh0dHBzOi8vcmRkaWFnbm9zdGljcy1nLWV1LXIwLnd2ZC5taWNyb3NvZnQuY29tLyIsIkVuZHBvaW50UG9vbElkIjoiMzQ3NzgxYjMtMzQ4Yi00YjFlLWI0YTMtNzBlZWEwMWMyM2NjIiwiR2xvYmFsQnJva2VyVXJpIjoiaHR0cHM6Ly9yZGJyb2tlci53dmQubWljcm9zb2Z0LmNvbS8iLCJHZW9ncmFwaHkiOiJFVSIsIkdsb2JhbEJyb2tlclJlc291cmNlSWRVcmkiOiJodHRwczovL3JkYnJva2VyLnd2ZC5taWNyb3NvZnQuY29tLyIsIkJyb2tlclJlc291cmNlSWRVcmkiOiJodHRwczovL3JkYnJva2VyLWctZXUtcjAud3ZkLm1pY3Jvc29mdC5jb20vIiwiRGlhZ25vc3RpY3NSZXNvdXJjZUlkVXJpIjoiaHR0cHM6Ly9yZGRpYWdub3N0aWNzLWctZXUtcjAud3ZkLm1pY3Jvc29mdC5jb20vIiwiQUFEVGVuYW50SWQiOiIzMjllOTFiMC1lMjFmLTQ4ZmItYTA3MS00NTY3MTdlY2MyOGUiLCJuYmYiOjE2NTUyOTQ0ODYsImV4cCI6MTY1NjYxMzgwMCwiaXNzIjoiUkRJbmZyYVRva2VuTWFuYWdlciIsImF1ZCI6IlJEbWkifQ')]"
                     },
                     "domain": {
                         "value": "[parameters('domain')]"
@@ -663,10 +673,10 @@
                         "value": "[parameters('ouPath')]"
                     },
                     "aadJoin": {
-                        "value": "[parameters('aadJoin')]"
+                        "value": "[parameters('true')]"
                     },
                     "intune": {
-                        "value": "[parameters('intune')]"
+                        "value": "[parameters('true')]"
                     },
                     "bootDiagnostics": {
                         "value": "[parameters('bootDiagnostics')]"
@@ -685,15 +695,6 @@
                     },
                     "SessionHostConfigurationVersion": {
                         "value": "[if(contains(parameters('systemData'), 'hostpoolUpdate'), parameters('systemData').sessionHostConfigurationVersion, '')]"
-                    },
-                    "securityType": {
-                        "value": "[parameters('securityType')]"
-                    },
-                    "secureBoot": {
-                        "value": "[parameters('secureBoot')]"
-                    },
-                    "vTPM": {
-                        "value": "[parameters('vTPM')]"
                     }
                 }
             }
