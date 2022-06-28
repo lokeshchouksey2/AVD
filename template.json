@@ -616,13 +616,13 @@
                         "value": "[parameters('svc-preprod')]"
                     },
                     "vmAdministratorAccountPassword": {
-                        "value": "[parameters('Dad#01WinterEnd')]"
+                        "value": "[parameters('vmAdministratorAccountPassword')]"
                     },
                     "administratorAccountUsername": {
                         "value": "[parameters('svc-preprod')]"
                     },
                     "administratorAccountPassword": {
-                        "value": "[parameters('Dad#01WinterEnd')]"
+                        "value": "[parameters('administratorAccountPassword')]"
                     },
                     "subnet-id": {
                         "value": "[variables('Pre_Prod_Subnet')]"
