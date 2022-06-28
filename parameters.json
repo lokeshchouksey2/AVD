@@ -1,0 +1,178 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "artifactsLocation": {
+            "value": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_05-03-2022.zip"
+        },
+        "nestedTemplatesLocation": {
+            "value": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/armtemplates/Hostpool_5-24-2022/nestedTemplates/"
+        },
+        "hostpoolToken": {
+            "value": null
+        },
+        "hostpoolProperties": {
+            "value": {
+                "friendlyName": null,
+                "description": "Created through the Azure Virtual Desktop extension",
+                "hostPoolType": "Personal",
+                "personalDesktopAssignmentType": "Direct",
+                "applicationGroupReferences": [
+                    "/subscriptions/3809d259-20d6-426f-b6c7-e82358b3dc7d/resourcegroups/RG-PrepProdTest/providers/Microsoft.DesktopVirtualization/applicationgroups/Vnextdaas"
+                ],
+                "customRdpProperty": "drivestoredirect:s:;audiomode:i:0;videoplaybackmode:i:1;redirectclipboard:i:1;redirectprinters:i:1;devicestoredirect:s:;redirectcomports:i:1;redirectsmartcards:i:1;usbdevicestoredirect:s:*;enablecredsspsupport:i:1;use multimon:i:1;targetisaadjoined:i:1;audiocapturemode:i:1;camerastoredirect:s:*;encode redirected video capture:i:1;",
+                "maxSessionLimit": 999999,
+                "loadBalancerType": "Persistent",
+                "validationEnvironment": false,
+                "ring": null,
+                "registrationInfo": {
+                    "expirationTime": "2022-06-30T18:30:00Z",
+                    "token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjcyM0YzMzgzQjhGNTBGRURDMjc0QTUyMUNFNEEwRTlDMkU0MjJBRjciLCJ0eXAiOiJKV1QifQ.eyJSZWdpc3RyYXRpb25JZCI6ImFmYTkxMGFmLWJmYWYtNGRjNS1iNTczLWE3ODRmNzVmZDhhNSIsIkJyb2tlclVyaSI6Imh0dHBzOi8vcmRicm9rZXItZy1ldS1yMC53dmQubWljcm9zb2Z0LmNvbS8iLCJEaWFnbm9zdGljc1VyaSI6Imh0dHBzOi8vcmRkaWFnbm9zdGljcy1nLWV1LXIwLnd2ZC5taWNyb3NvZnQuY29tLyIsIkVuZHBvaW50UG9vbElkIjoiMzQ3NzgxYjMtMzQ4Yi00YjFlLWI0YTMtNzBlZWEwMWMyM2NjIiwiR2xvYmFsQnJva2VyVXJpIjoiaHR0cHM6Ly9yZGJyb2tlci53dmQubWljcm9zb2Z0LmNvbS8iLCJHZW9ncmFwaHkiOiJFVSIsIkdsb2JhbEJyb2tlclJlc291cmNlSWRVcmkiOiJodHRwczovL3JkYnJva2VyLnd2ZC5taWNyb3NvZnQuY29tLyIsIkJyb2tlclJlc291cmNlSWRVcmkiOiJodHRwczovL3JkYnJva2VyLWctZXUtcjAud3ZkLm1pY3Jvc29mdC5jb20vIiwiRGlhZ25vc3RpY3NSZXNvdXJjZUlkVXJpIjoiaHR0cHM6Ly9yZGRpYWdub3N0aWNzLWctZXUtcjAud3ZkLm1pY3Jvc29mdC5jb20vIiwiQUFEVGVuYW50SWQiOiIzMjllOTFiMC1lMjFmLTQ4ZmItYTA3MS00NTY3MTdlY2MyOGUiLCJuYmYiOjE2NTUyOTQ0ODYsImV4cCI6MTY1NjYxMzgwMCwiaXNzIjoiUkRJbmZyYVRva2VuTWFuYWdlciIsImF1ZCI6IlJEbWkifQ.DmcJoe8S1hFEXgYTZeImn4CV10dbzJm_HCxh3F2YHm6WWZo60smgz1pUSeAPbWZksDOF0eCfoGR9HQQuNRArhH0Wb9csaFYqfNRV8NCMs8i46jeMWXGg01tIUrOubp-lolVIClnXa6vrPWOZ8-eonod-8KG9bOIxl-cNwPjP1BhtF7KiHCcMIiBI2CMZrBmn8r7ZpA0al4D1U0QpuQqqAG13JNZ12hINyC2dBkamKXR3b5deNlWsd5TQlDetjawZhulu4aUDK1_NUv-VTlVKWENv-FcG3iuHxWG933IlaCHSYMUFIpLCkF_TKdm1YelMaefUR7BFa-FDcIYdMqAcyA",
+                    "resetToken": false,
+                    "registrationTokenOperation": "None"
+                },
+                "vmTemplate": "{\"domain\":\"\",\"galleryImageOffer\":null,\"galleryImagePublisher\":null,\"galleryImageSKU\":null,\"imageType\":\"CustomImage\",\"imageUri\":null,\"customImageId\":\"/subscriptions/3809d259-20d6-426f-b6c7-e82358b3dc7d/resourceGroups/rg-iasp-eun-management/providers/Microsoft.Compute/galleries/VnextDaasGallery/images/MI-NE-AVD-P-01-BaseImage/versions/0.0.3\",\"namePrefix\":\"avdvnext50\",\"osDiskType\":\"Standard_LRS\",\"vmSize\":{\"id\":\"Standard_D2s_v3\",\"cores\":2,\"ram\":8},\"galleryItemId\":null,\"hibernate\":false,\"diskSizeGB\":0}",
+                "preferredAppGroupType": "Desktop",
+                "migrationRequest": null,
+                "cloudPcResource": false,
+                "startVMOnConnect": true,
+                "ssoadfsAuthority": null,
+                "ssoClientId": null,
+                "ssoClientSecretKeyVaultPath": null,
+                "ssoSecretType": null,
+                "objectId": "347781b3-348b-4b1e-b4a3-70eea01c23cc"
+            }
+        },
+        "vmInitialNumber": {
+            "value": 3
+        },
+        "intune": {
+            "value": true
+        },
+        "hostpoolResourceGroup": {
+            "value": "RG-PrepProdTest"
+        },
+        "hostpoolLocation": {
+            "value": "northeurope"
+        },
+        "hostpoolName": {
+            "value": "HP-PreprodTest"
+        },
+        "vmResourceGroup": {
+            "value": "RG-PrepProdTest"
+        },
+        "vmNamePrefix": {
+            "value": "avdvnext50"
+        },
+        "vmLocation": {
+            "value": "northeurope"
+        },
+        "availabilityOption": {
+            "value": "AvailabilityZone"
+        },
+        "availabilitySetName": {
+            "value": ""
+        },
+        "createAvailabilitySet": {
+            "value": false
+        },
+        "availabilitySetUpdateDomainCount": {
+            "value": 5
+        },
+        "availabilitySetFaultDomainCount": {
+            "value": 2
+        },
+        "availabilityZone": {
+            "value": 2
+        },
+        "vmImageType": {
+            "value": "CustomImage"
+        },
+        "vmSize": {
+            "value": "Standard_D2s_v3"
+        },
+        "vmNumberOfInstances": {
+            "value": 2
+        },
+        "vmDiskType": {
+            "value": "Standard_LRS"
+        },
+        "vmDiskSizeGB": {
+            "value": 0
+        },
+        "vmHibernate": {
+            "value": false
+        },
+        "bootDiagnostics": {
+            "value": {
+                "enabled": true
+            }
+        },
+        "securityType": {
+            "value": "Standard"
+        },
+        "secureBoot": {
+            "value": false
+        },
+        "vTPM": {
+            "value": false
+        },
+        "virtualNetworkResourceGroupName": {
+            "value": "rg-iasp-eun-lz-network"
+        },
+        "existingVnetName": {
+            "value": "vnet-iasp-eun-lz-network"
+        },
+        "existingSubnetName": {
+            "value": "Pre_Prod_Subnet"
+        },
+        "createNetworkSecurityGroup": {
+            "value": false
+        },
+        "aadJoin": {
+            "value": true
+        },
+        "administratorAccountUsername": {
+            "value": "svc-preprod"
+        },
+        "administratorAccountPassword": {
+            "value": null
+        },
+        "domain": {
+            "value": ""
+        },
+        "ouPath": {
+            "value": ""
+        },
+        "vmAdministratorAccountUsername": {
+            "value": "svc-preprod"
+        },
+        "vmAdministratorAccountPassword": {
+            "value": null
+        },
+        "availabilitySetTags": {
+            "value": {}
+        },
+        "networkInterfaceTags": {
+            "value": {}
+        },
+        "networkSecurityGroupTags": {
+            "value": {}
+        },
+        "virtualMachineTags": {
+            "value": {}
+        },
+        "imageTags": {
+            "value": {}
+        },
+        "deploymentId": {
+            "value": "7107b06d-f810-4937-a4b6-ff0613ad6204"
+        },
+        "apiVersion": {
+            "value": "2021-09-03-preview"
+        },
+        "vmCustomImageSourceId": {
+            "value": "/subscriptions/3809d259-20d6-426f-b6c7-e82358b3dc7d/resourceGroups/rg-iasp-eun-management/providers/Microsoft.Compute/galleries/VnextDaasGallery/images/MI-NE-AVD-P-01-BaseImage/versions/0.0.3"
+        }
+    }
+}
