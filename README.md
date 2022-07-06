@@ -1,6 +1,6 @@
 Click the button below to deploy:
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Flokeshchouksey2%2FAVD%2Fmain%2Ftemplate.json"  target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAVD%2Fmain%2Ftemplate.json"  target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 <a href="http://armviz.io/#/?load=https://raw.githubusercontent.com/lokeshchouksey2/AVD/main/template.json" target="_blank">
